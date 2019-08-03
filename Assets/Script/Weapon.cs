@@ -9,8 +9,10 @@ public class Weapon : MonoBehaviour
     public GameObject fireMagic;
     public float weaponCooldown, magicCooldown = 0.0f;
     public bool shieldActive = false;
+    public AudioClip fireClip;
 
     Vector3 lastPositionRight, lastPositionLeft;
+    GameObject currentMagic;
 
     public const float WEAPON_COOLDOWN_TIME = 0.5F;
     public const float MAGIC_COOLDOWN_TIME = 2.0F;
@@ -29,19 +31,60 @@ public class Weapon : MonoBehaviour
 
         if (Input.GetAxis("HTC_VIU_LeftTrigger") > 0.1f && leftWeapon.activeInHierarchy) 
         {
-            //TODO: gatillo izquierdo para cubrirnos con el escudo
+            shieldActive = true;
         }
-        if (Input.GetAxis("HTC_VIU_RightTrigger") > 0.1f)
+        else
         {
-            //TODO: gatillo derecho disparar fuego  si tenemos vara seleccionada
+            shieldActive = false;
         }
-        if (Input.GetAxis("HTC_VIU_LeftGrip") > 0.1f)
+        if (Input.GetAxis("HTC_VIU_RightTrigger") > 0.1f && magicCooldown > MAGIC_COOLDOWN_TIME)
         {
-            //TODO: mostrar / ocultar el escudo
+            if (currentMagic != null)
+            {
+                magicCooldown = 0;
+
+                Vector3 force = 20.0f*(rightHand.transform.position - lastPositionRight) / Time.deltaTime;
+                currentMagic.transform.parent = null;
+                currentMagic.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+                currentMagic.GetComponent<Rigidbody>().AddForce(force, ForceMode.Impulse);
+                //AudioClip fireClip = Resources.Load<AudioClip>("Audio/FireShoot6");
+                currentMagic.GetComponent<AudioSource>().PlayOneShot(fireClip);
+                Invoke("LoadMagic", MAGIC_COOLDOWN_TIME);
+            }
         }
-        if (Input.GetAxis("HTC_VIU_RightGrip") > 0.1f)
+        if (Input.GetAxis("HTC_VIU_LeftGrip") > 0.1f && weaponCooldown > WEAPON_COOLDOWN_TIME) 
         {
-            //TODO: cambiar de arma
+            weaponCooldown = 0;
+            leftWeapon.SetActive(!leftWeapon.activeInHierarchy);
+        }
+        if (Input.GetAxis("HTC_VIU_RightGrip") > 0.1f && weaponCooldown > WEAPON_COOLDOWN_TIME) 
+        {
+            weaponCooldown = 0;
+            rightWeapon.SetActive(!rightWeapon.activeInHierarchy);
+            rightWeaponAlt.SetActive(!rightWeaponAlt.activeInHierarchy);
+            if (rightWeaponAlt.activeInHierarchy)
+            {
+                LoadMagic();
+            }
+            else
+            {
+                Destroy(currentMagic);
+            }
+        }
+        lastPositionRight = rightHand.transform.position;
+        lastPositionLeft = leftHand.transform.position;
+
+    }
+
+    void LoadMagic()
+    {
+        if (currentMagic != null)
+        {
+            Destroy(currentMagic);
+        }
+        else
+        {
+            currentMagic = Instantiate(fireMagic, magicLaunchPoint.transform);
         }
     }
 }
