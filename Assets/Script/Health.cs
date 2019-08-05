@@ -8,11 +8,16 @@ public class Health : MonoBehaviour
 
     [SerializeField]
     private float healthPoints =100.0f;
+    private Animator animator;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        if (GetComponent<Animator>() != null)
+        {
+            animator = GetComponent<Animator>();
+            animator.SetFloat("health", HealthPoints);
+        }
     }
 
     public float HealthPoints
@@ -25,9 +30,18 @@ public class Health : MonoBehaviour
         {
             healthPoints = value;
 
+            if (animator != null)
+            {
+                animator.SetFloat("health", HealthPoints);
+            }
+
             if (healthPoints<=0)
             {
-                //TODO: gestionar muerte del personaje
+                GetComponent<Rigidbody>().useGravity = true;
+                if (type == damageType.enemy)
+                {
+                    Destroy(gameObject, 2.0f);
+                }
             }
         }
     }
