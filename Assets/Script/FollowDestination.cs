@@ -6,9 +6,10 @@ public class FollowDestination : MonoBehaviour
 {
     GameObject[] destinations;
     Transform destination;
+    GameObject player;
+    Animator animator;
 
     public float speed = 5.0f;
-    GameObject player;
 
     // Start is called before the first frame update
     void Start()
@@ -16,6 +17,7 @@ public class FollowDestination : MonoBehaviour
         destinations = GameObject.FindGameObjectsWithTag("waypoint");
         player = GameObject.FindGameObjectWithTag("Player");
         destination = destinations[Random.Range(0, destinations.Length)].transform;
+        animator = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -31,6 +33,8 @@ public class FollowDestination : MonoBehaviour
 
         Debug.DrawRay(transform.position, newDirection, Color.red);
         transform.rotation = Quaternion.LookRotation(newDirection);
+
+        animator.SetFloat("distance", targetDirection.magnitude);
 
         //cambio de target
         if (targetDirection.magnitude < 0.1f)
