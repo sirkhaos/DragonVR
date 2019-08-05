@@ -20,7 +20,7 @@ public class MenuBar : MonoBehaviour
     void Start()
     {
         slider = GetComponent<Slider>();
-        target = GameObject.Find("Player");
+        //target = GameObject.Find("Player");
         switch (barType)
         {
             case BarType.health:
